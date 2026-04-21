@@ -1,0 +1,18 @@
+# node_modules
+node_modules
+
+# env files
+.env
+
+# prisma
+/prisma/migrations
+/generated/prisma
+
+# logs
+logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
