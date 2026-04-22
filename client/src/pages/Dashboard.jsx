@@ -187,48 +187,75 @@ const Dashboard = () => {
                       key={board.id} 
                       className="glass animate-fade" 
                       onClick={() => navigate(`/board/${board.id}`)}
-                      style={{ 
-                        padding: '32px', 
-                        borderRadius: '28px', 
-                        cursor: 'pointer', 
-                        position: 'relative',
-                        transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
-                        background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.7))',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-12px) scale(1.02)';
-                        e.currentTarget.style.borderColor = 'var(--primary)';
-                        e.currentTarget.style.boxShadow = '0 20px 40px -10px rgba(0,0,0,0.5), 0 0 20px var(--primary-glow)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                        e.currentTarget.style.borderColor = 'var(--glass-border)';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-                        <div style={{ background: 'var(--primary)', padding: '12px', borderRadius: '14px' }}>
-                          <Layout size={24} color="white" />
-                        </div>
-                        {user?.role === 'ADMIN' && (
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); setConfirmData({ isOpen: true, id: board.id }); }}
-                            className="btn"
-                            style={{ padding: '8px', background: 'none', color: 'rgba(255,255,255,0.2)' }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--danger)'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.2)'}
-                          >
-                            <Trash2 size={20} />
-                          </button>
-                        )}
-                      </div>
-                      <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '8px' }}>{board.title}</h3>
-                      <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                        <span>{board.columns?.length || 3} Columns</span>
-                        <span>•</span>
-                        <span>{board.columns?.reduce((acc, c) => acc + (c.tasks?.length || 0), 0) || 0} Tasks</span>
-                      </div>
+                  style={{ 
+                    padding: '32px', 
+                    borderRadius: '28px', 
+                    cursor: 'pointer', 
+                    position: 'relative',
+                    transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
+                    background: 'rgba(30, 41, 59, 0.4)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-12px) scale(1.02)';
+                    e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.5)';
+                    e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.2)';
+                    e.currentTarget.style.background = 'rgba(30, 41, 59, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(0, 0, 0, 0.3)';
+                    e.currentTarget.style.background = 'rgba(30, 41, 59, 0.4)';
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                    <div style={{ 
+                      background: 'linear-gradient(135deg, var(--primary), #818cf8)', 
+                      padding: '14px', 
+                      borderRadius: '16px',
+                      boxShadow: '0 8px 16px rgba(99, 102, 241, 0.3)'
+                    }}>
+                      <Layout size={26} color="white" />
                     </div>
+                    {user?.role === 'ADMIN' && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setConfirmData({ isOpen: true, id: board.id }); }}
+                        className="btn"
+                        style={{ 
+                          padding: '10px', 
+                          background: 'rgba(255,255,255,0.03)', 
+                          color: 'rgba(255,255,255,0.3)',
+                          borderRadius: '50%',
+                          border: '1px solid rgba(255,255,255,0.05)',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = 'var(--danger)';
+                          e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                          e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                          e.currentTarget.style.transform = 'rotate(15deg) scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'rgba(255,255,255,0.3)';
+                          e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                          e.currentTarget.style.transform = 'rotate(0deg) scale(1)';
+                        }}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                  </div>
+                  <h3 style={{ fontSize: '22px', fontWeight: '800', marginBottom: '10px', color: 'white', letterSpacing: '-0.02em' }}>{board.title}</h3>
+                  <div style={{ display: 'flex', gap: '12px', fontSize: '14px', color: 'var(--text-secondary)', fontWeight: '500' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>{board.columns?.length || 3} Columns</span>
+                    <span style={{ opacity: 0.3 }}>•</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>{board.columns?.reduce((acc, c) => acc + (c.tasks?.length || 0), 0) || 0} Tasks</span>
+                  </div>
+                </div>
                   ))}
                 </div>
               )}
