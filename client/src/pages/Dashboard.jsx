@@ -100,7 +100,7 @@ const Dashboard = () => {
               </div>
               <h3>No Boards Found</h3>
               <p style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>
-                {user?.role === 'ADMIN' ? 'Start by creating your first board above.' : 'Admin has to assign, so please wait.'}
+                {user?.role === 'ADMIN' ? 'Start by creating your first board above.' : 'Ask admin to assign'}
               </p>
             </div>
           ) : (
