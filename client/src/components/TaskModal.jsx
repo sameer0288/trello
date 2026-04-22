@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { X, Calendar, User, AlignLeft, Trash2, Clock, CheckCircle, List } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ConfirmModal from './ConfirmModal';
 
 const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
   });
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -32,7 +34,7 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
       const res = await api.get('/users');
       setUsers(res.data);
     } catch (err) {
-      // Silent error for users load
+      // Slient
     }
   };
 
@@ -57,7 +59,6 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Permanently delete this task?')) return;
     try {
       await api.delete(`/tasks/${task.id}`);
       toast.success('Task deleted');
@@ -158,7 +159,7 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
             {task ? (
               <button 
                 type="button" 
-                onClick={handleDelete} 
+                onClick={() => setIsConfirmOpen(true)} 
                 className="btn btn-danger"
                 style={{ padding: '12px 24px' }}
               >
@@ -186,6 +187,14 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
           </div>
         </form>
       </div>
+
+      <ConfirmModal 
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Task?"
+        message="This will permanently remove this task. You cannot undo this action."
+      />
     </div>
   );
 };

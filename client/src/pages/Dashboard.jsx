@@ -4,11 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, Layout, LogOut, User as UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Dashboard = () => {
   const [boards, setBoards] = useState([]);
   const [newBoardTitle, setNewBoardTitle] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [confirmData, setConfirmData] = useState({ isOpen: false, id: null });
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -44,9 +46,8 @@ const Dashboard = () => {
     }
   };
 
-  const deleteBoard = async (id, e) => {
-    e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this board?')) return;
+  const deleteBoard = async () => {
+    const id = confirmData.id;
     try {
       await api.delete(`/boards/${id}`);
       setBoards(boards.filter(b => b.id !== id));
@@ -144,7 +145,7 @@ const Dashboard = () => {
                     </div>
                     {user?.role === 'ADMIN' && (
                       <button 
-                        onClick={(e) => deleteBoard(board.id, e)}
+                        onClick={(e) => { e.stopPropagation(); setConfirmData({ isOpen: true, id: board.id }); }}
                         className="btn"
                         style={{ padding: '8px', background: 'none', color: 'rgba(255,255,255,0.2)' }}
                         onMouseEnter={(e) => e.currentTarget.style.color = 'var(--danger)'}
@@ -166,6 +167,14 @@ const Dashboard = () => {
           )}
         </div>
       </main>
+
+      <ConfirmModal 
+        isOpen={confirmData.isOpen} 
+        onClose={() => setConfirmData({ ...confirmData, isOpen: false })}
+        onConfirm={deleteBoard}
+        title="Delete Board?"
+        message="This will permanently remove the board and all columns and tasks inside it. This action cannot be undone."
+      />
     </div>
   );
 };
