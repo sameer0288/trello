@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { X, Calendar, User, AlignLeft, Trash2, Clock, CheckCircle, List, ChevronDown } from 'lucide-react';
+import { X, Calendar, User as UserIcon, AlignLeft, Trash2, Clock, CheckCircle, List, ChevronDown, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from './ConfirmModal';
+import { useAuth } from '../context/AuthContext';
 
 const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -15,6 +17,8 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
+  const isAdmin = user?.role === 'ADMIN';
+
   useEffect(() => {
     if (task) {
       setFormData({
@@ -24,10 +28,15 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
         dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
       });
     } else {
-      setFormData({ title: '', description: '', assigneeId: '', dueDate: '' });
+      setFormData({ 
+        title: '', 
+        description: '', 
+        assigneeId: isAdmin ? '' : user?.id, 
+        dueDate: '' 
+      });
     }
     fetchUsers();
-  }, [task, isOpen]);
+  }, [task, isOpen, user, isAdmin]);
 
   const fetchUsers = async () => {
     try {
@@ -41,12 +50,18 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    
+    const submissionData = {
+      ...formData,
+      assigneeId: isAdmin ? formData.assigneeId : user?.id
+    };
+
     try {
       if (task) {
-        await api.put(`/tasks/${task.id}`, formData);
+        await api.put(`/tasks/${task.id}`, submissionData);
         toast.success('Task updated');
       } else {
-        await api.post('/tasks', { ...formData, columnId });
+        await api.post('/tasks', { ...submissionData, columnId });
         toast.success('Task created');
       }
       onSuccess();
@@ -92,6 +107,17 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
             color: white !important;
             padding: 12px;
           }
+          .readonly-assignee {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            padding: 12px 16px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+            font-weight: 500;
+          }
         `}</style>
 
         <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
@@ -131,32 +157,43 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
                 <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-secondary)' }}>DESCRIPTION</label>
              </div>
             <textarea 
-              rows="5"
+              rows="4"
               placeholder="Add more context or details..."
               value={formData.description} 
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              style={{ padding: '20px', fontSize: '15px', resize: 'none', background: 'rgba(0,0,0,0.2)', height: '140px', lineHeight: '1.6' }}
+              style={{ padding: '20px', fontSize: '15px', resize: 'none', background: 'rgba(0,0,0,0.2)', height: '120px', lineHeight: '1.6' }}
             />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                <User size={16} color="var(--text-secondary)" />
+                <UserIcon size={16} color="var(--text-secondary)" />
                 <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-secondary)' }}>ASSIGNEE</label>
               </div>
-              <div style={{ position: 'relative' }}>
-                <select 
-                  className="custom-select"
-                  value={formData.assigneeId} 
-                  onChange={(e) => setFormData({...formData, assigneeId: e.target.value})}
-                  style={{ background: 'rgba(15, 23, 42, 0.8)', borderRadius: '14px', paddingRight: '40px' }}
-                >
-                  <option value="">No one assigned</option>
-                  {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                </select>
-                <ChevronDown size={18} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.5 }} />
-              </div>
+              
+              {isAdmin ? (
+                <div style={{ position: 'relative' }}>
+                  <select 
+                    className="custom-select"
+                    value={formData.assigneeId} 
+                    onChange={(e) => setFormData({...formData, assigneeId: e.target.value})}
+                    style={{ background: 'rgba(15, 23, 42, 0.8)', borderRadius: '14px', paddingRight: '40px' }}
+                  >
+                    <option value="">No one assigned</option>
+                    {users.map(u => <option key={u.id} value={u.id}>{u.name} {u.id === user?.id ? '(Me)' : ''}</option>)}
+                  </select>
+                  <ChevronDown size={18} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.5 }} />
+                </div>
+              ) : (
+                <div className="readonly-assignee">
+                  <div style={{ width: '28px', height: '28px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'white' }}>
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <span>{user?.name} (Auto-assigned)</span>
+                  <ShieldCheck size={14} style={{ marginLeft: 'auto', color: 'var(--primary)', opacity: 0.8 }} />
+                </div>
+              )}
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
@@ -184,7 +221,7 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
               </button>
             ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '13px' }}>
-                    <Clock size={16} /> Ready to publish
+                    <Clock size={16} /> Created by you
                 </div>
             )}
             

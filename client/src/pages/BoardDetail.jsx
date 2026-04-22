@@ -4,7 +4,7 @@ import api from '../api/axios';
 import { DndContext, closestCorners, DragOverlay, PointerSensor, useSensor, useSensors, defaultDropAnimationSideEffects } from '@dnd-kit/core';
 import Column from '../components/Column';
 import TaskCard from '../components/TaskCard';
-import { ArrowLeft, Loader2, Filter, User as UserIcon, Search } from 'lucide-react';
+import { ArrowLeft, Loader2, Filter, User as UserIcon, Search, Users, Layers, ChevronDown } from 'lucide-react';
 import TaskModal from '../components/TaskModal';
 import { useAuth } from '../context/AuthContext';
 
@@ -121,49 +121,107 @@ const BoardDetail = () => {
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ position: 'relative' }}>
-              <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Search size={18} style={{ position: 'absolute', left: '14px', color: 'var(--text-secondary)', transition: 'color 0.3s ease' }} />
               <input 
                 type="text" 
                 placeholder="Search tasks..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ paddingLeft: '40px', width: '240px', fontSize: '14px' }}
+                style={{ 
+                  paddingLeft: '44px', 
+                  width: '260px', 
+                  fontSize: '14px', 
+                  background: 'rgba(30, 41, 59, 0.4)',
+                  border: '1px solid var(--glass-border)',
+                  borderRadius: '16px',
+                  height: '46px',
+                  transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)'
+                }}
+                onFocus={(e) => {
+                  e.target.style.width = '320px';
+                  e.target.style.borderColor = 'var(--primary)';
+                  e.target.style.background = 'rgba(30, 41, 59, 0.6)';
+                  e.target.style.boxShadow = '0 0 20px rgba(99, 102, 241, 0.15)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.width = '260px';
+                  e.target.style.borderColor = 'var(--glass-border)';
+                  e.target.style.background = 'rgba(30, 41, 59, 0.4)';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px' }}>
-              <button 
-                className={`btn ${filterUser === 'all' ? 'btn-primary' : ''}`}
-                onClick={() => setFilterUser('all')}
-                style={{ padding: '8px 16px' }}
-              >
-                All
-              </button>
-              <button 
-                className={`btn ${filterUser === user.id ? 'btn-primary' : ''}`}
-                onClick={() => setFilterUser(user.id)}
-                style={{ padding: '8px 16px' }}
-              >
-                My Tasks
-              </button>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '2px', 
+              background: '#1a1f2e', 
+              padding: '8px 12px', 
+              borderRadius: '20px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+            }}>
+              <div style={{ display: 'flex', gap: '8px', paddingRight: '12px', borderRight: '1px solid rgba(255,255,255,0.1)' }}>
+                <button 
+                  onClick={() => setFilterUser('all')}
+                  style={{ 
+                    padding: '10px 24px',
+                    borderRadius: '16px',
+                    background: filterUser === 'all' ? '#6366f1' : 'transparent',
+                    color: filterUser === 'all' ? 'white' : '#94a3b8',
+                    border: 'none',
+                    fontSize: '15px',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: filterUser === 'all' ? '0 0 20px rgba(99, 102, 241, 0.4)' : 'none',
+                  }}
+                >
+                  All
+                </button>
+                <button 
+                  onClick={() => setFilterUser(user.id)}
+                  style={{ 
+                    padding: '10px 24px',
+                    borderRadius: '16px',
+                    background: filterUser === user.id ? '#6366f1' : '#f1f5f9',
+                    color: filterUser === user.id ? 'white' : '#0f172a',
+                    border: 'none',
+                    fontSize: '15px',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: filterUser === user.id ? '0 0 20px rgba(99, 102, 241, 0.4)' : 'none',
+                  }}
+                >
+                  My Tasks
+                </button>
+              </div>
               
               {user.role === 'ADMIN' && (
-                <div style={{ marginLeft: '8px', paddingLeft: '8px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ paddingLeft: '12px', position: 'relative', display: 'flex', alignItems: 'center' }}>
                   <select 
                     value={filterUser} 
                     onChange={(e) => setFilterUser(e.target.value)}
                     style={{ 
-                      width: '160px', 
-                      background: 'rgba(30, 41, 59, 0.9)', 
-                      border: '1px solid var(--primary)', 
-                      fontSize: '14px',
-                      color: 'white'
+                      width: '200px', 
+                      background: 'transparent', 
+                      border: '1px solid #4f46e5', 
+                      fontSize: '16px',
+                      color: 'white',
+                      padding: '10px 40px 10px 20px',
+                      borderRadius: '18px',
+                      appearance: 'none',
+                      cursor: 'pointer',
+                      fontWeight: '600'
                     }}
                   >
-                    <option value="all">Filter by Member...</option>
-                    {users.map(u => <option key={u.id} value={u.id} style={{ background: '#1e293b' }}>{u.name}</option>)}
+                    <option value="all" style={{ background: '#1a1f2e' }}>Filter by Member...</option>
+                    {users.map(u => <option key={u.id} value={u.id} style={{ background: '#1a1f2e' }}>{u.name}</option>)}
                   </select>
+                  <ChevronDown size={18} style={{ position: 'absolute', right: '15px', color: 'white', pointerEvents: 'none' }} />
                 </div>
               )}
             </div>
