@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Layout, Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Layout, Mail, Lock, ArrowRight, Loader2, Eye, EyeOff, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -17,12 +18,16 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    const loadToast = toast.loading('Authenticating...');
     try {
       const res = await api.post('/auth/login', { email, password });
+      toast.success(`Welcome back, ${res.data.user.name}!`, { id: loadToast });
       login(res.data.user, res.data.token);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Invalid email or password');
+      const msg = err.response?.data?.error || 'Invalid email or password';
+      setError(msg);
+      toast.error(msg, { id: loadToast });
     } finally {
       setLoading(false);
     }
@@ -79,6 +84,15 @@ const Login = () => {
         .input-group:focus-within .input-icon {
           color: var(--primary) !important;
         }
+        .error-shake {
+          animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
       `}</style>
 
       {/* Dynamic background elements */}
@@ -106,17 +120,23 @@ const Login = () => {
         </div>
 
         {error && (
-          <div style={{ 
-            background: 'rgba(239, 68, 68, 0.1)', 
+          <div className="error-shake" style={{ 
+            background: 'rgba(239, 68, 68, 0.08)', 
             color: '#fca5a5', 
-            padding: '10px 14px', 
-            borderRadius: '10px', 
+            padding: '12px 16px', 
+            borderRadius: '14px', 
             marginBottom: '20px', 
-            fontSize: '12px', 
-            border: '1px solid rgba(239, 68, 68, 0.15)', 
-            textAlign: 'center'
+            fontSize: '13px', 
+            border: '1px solid rgba(239, 68, 68, 0.2)', 
+            textAlign: 'left',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
           }}>
-            {error}
+             <div style={{ background: 'var(--danger)', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <X size={14} color="white" />
+             </div>
+             <span style={{ fontWeight: '500' }}>{error}</span>
           </div>
         )}
 

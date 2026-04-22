@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Layout, Mail, Lock, User, Shield, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Layout, Mail, Lock, User, Shield, ArrowRight, Loader2, Eye, EyeOff, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'USER' });
@@ -14,11 +15,15 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    const loadToast = toast.loading('Creating account...');
     try {
       await api.post('/auth/register', formData);
+      toast.success('Account created! Please sign in.', { id: loadToast });
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Try again.');
+      const msg = err.response?.data?.error || 'Registration failed. Try again.';
+      setError(msg);
+      toast.error(msg, { id: loadToast });
     } finally {
       setLoading(false);
     }
@@ -75,6 +80,15 @@ const Register = () => {
         .input-group:focus-within .input-icon {
           color: var(--primary) !important;
         }
+        .error-shake {
+          animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
       `}</style>
 
       {/* Dynamic background elements */}
@@ -86,32 +100,38 @@ const Register = () => {
           <div style={{ 
             width: '60px', 
             height: '60px', 
-            background: 'linear-gradient(135deg, var(--primary), #818cf8)', 
+            background: 'linear-gradient(135deg, #6366f1, #818cf8)', 
             borderRadius: '18px', 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
-            margin: '0 auto 16px', 
-            boxShadow: '0 10px 20px -5px var(--primary-glow)',
+            margin: '0 auto 12px', 
+            boxShadow: '0 8px 16px -4px rgba(99, 102, 241, 0.4)',
           }}>
             <Layout size={30} color="white" />
           </div>
           <h2 style={{ fontSize: '28px', fontWeight: '800', letterSpacing: '-0.03em', marginBottom: '8px', color: 'white' }}>Create Account</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '500' }}>Start your journey with Mini Trello</p>
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', fontWeight: '500' }}>Start your journey with Mini Trello</p>
         </div>
 
         {error && (
-          <div style={{ 
+          <div className="error-shake" style={{ 
             background: 'rgba(239, 68, 68, 0.08)', 
             color: '#fca5a5', 
             padding: '12px 16px', 
-            borderRadius: '12px', 
+            borderRadius: '14px', 
             marginBottom: '24px', 
             fontSize: '13px', 
-            border: '1px solid rgba(239, 68, 68, 0.15)', 
-            textAlign: 'center' 
+            border: '1px solid rgba(239, 68, 68, 0.2)', 
+            textAlign: 'left',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
           }}>
-            {error}
+             <div style={{ background: 'var(--danger)', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <X size={14} color="white" />
+             </div>
+             <span style={{ fontWeight: '500' }}>{error}</span>
           </div>
         )}
 
