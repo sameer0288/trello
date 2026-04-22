@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { X, Calendar, User, AlignLeft, Trash2, Clock, CheckCircle, List } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
       const res = await api.get('/users');
       setUsers(res.data);
     } catch (err) {
-      console.error(err);
+      // Silent error for users load
     }
   };
 
@@ -41,13 +42,15 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
     try {
       if (task) {
         await api.put(`/tasks/${task.id}`, formData);
+        toast.success('Task updated');
       } else {
         await api.post('/tasks', { ...formData, columnId });
+        toast.success('Task created');
       }
       onSuccess();
       onClose();
     } catch (err) {
-      console.error(err);
+      toast.error('Could not save task');
     } finally {
       setLoading(false);
     }
@@ -57,10 +60,11 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
     if (!window.confirm('Permanently delete this task?')) return;
     try {
       await api.delete(`/tasks/${task.id}`);
+      toast.success('Task deleted');
       onSuccess();
       onClose();
     } catch (err) {
-      console.error(err);
+      toast.error('Failed to delete task');
     }
   };
 
@@ -76,7 +80,6 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
         padding: '0', borderRadius: '32px', width: '640px', maxWidth: '95%',
         position: 'relative', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
       }}>
-        {/* Modal Header */}
         <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ background: 'var(--primary)', padding: '8px', borderRadius: '10px' }}>

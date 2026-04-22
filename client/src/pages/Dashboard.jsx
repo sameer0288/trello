@@ -3,10 +3,12 @@ import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, Layout, LogOut, User as UserIcon } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Dashboard = () => {
   const [boards, setBoards] = useState([]);
   const [newBoardTitle, setNewBoardTitle] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -19,30 +21,38 @@ const Dashboard = () => {
       const res = await api.get('/boards');
       setBoards(res.data);
     } catch (err) {
-      console.error(err);
+      toast.error('Could not load boards');
     }
   };
 
   const createBoard = async (e) => {
     e.preventDefault();
-    if (!newBoardTitle.trim()) return;
+    if (!newBoardTitle.trim()) {
+      toast.error('Please enter a board name first!');
+      return;
+    }
+    setIsCreating(true);
     try {
       const res = await api.post('/boards', { title: newBoardTitle });
       setBoards([...boards, res.data]);
       setNewBoardTitle('');
+      toast.success('Board created successfully!');
     } catch (err) {
-      console.error(err);
+      toast.error('Failed to create board: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setIsCreating(false);
     }
   };
 
   const deleteBoard = async (id, e) => {
     e.stopPropagation();
-    if (!window.confirm('Delete this board?')) return;
+    if (!window.confirm('Are you sure you want to delete this board?')) return;
     try {
       await api.delete(`/boards/${id}`);
       setBoards(boards.filter(b => b.id !== id));
+      toast.success('Board deleted');
     } catch (err) {
-      console.error(err);
+      toast.error('Failed to delete board');
     }
   };
 
@@ -86,8 +96,8 @@ const Dashboard = () => {
                   value={newBoardTitle} 
                   onChange={(e) => setNewBoardTitle(e.target.value)} 
                 />
-                <button className="btn btn-primary" type="submit" style={{ whiteSpace: 'nowrap' }}>
-                  <Plus size={20} /> Create Board
+                <button className="btn btn-primary" type="submit" disabled={isCreating} style={{ whiteSpace: 'nowrap' }}>
+                  <Plus size={20} /> {isCreating ? 'Creating...' : 'Create Board'}
                 </button>
               </form>
             )}
