@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { X, Calendar, User, AlignLeft, Trash2, Clock, CheckCircle, List } from 'lucide-react';
+import { X, Calendar, User, AlignLeft, Trash2, Clock, CheckCircle, List, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from './ConfirmModal';
 
@@ -81,6 +81,19 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
         padding: '0', borderRadius: '32px', width: '640px', maxWidth: '95%',
         position: 'relative', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
       }}>
+        {/* Style tag for custom select styling */}
+        <style>{`
+          .custom-select {
+            appearance: none;
+            cursor: pointer;
+          }
+          .custom-select option {
+            background-color: #0f172a !important;
+            color: white !important;
+            padding: 12px;
+          }
+        `}</style>
+
         <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ background: 'var(--primary)', padding: '8px', borderRadius: '10px' }}>
@@ -132,14 +145,18 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
                 <User size={16} color="var(--text-secondary)" />
                 <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-secondary)' }}>ASSIGNEE</label>
               </div>
-              <select 
-                value={formData.assigneeId} 
-                onChange={(e) => setFormData({...formData, assigneeId: e.target.value})}
-                style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '14px' }}
-              >
-                <option value="">No one assigned</option>
-                {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-              </select>
+              <div style={{ position: 'relative' }}>
+                <select 
+                  className="custom-select"
+                  value={formData.assigneeId} 
+                  onChange={(e) => setFormData({...formData, assigneeId: e.target.value})}
+                  style={{ background: 'rgba(15, 23, 42, 0.8)', borderRadius: '14px', paddingRight: '40px' }}
+                >
+                  <option value="">No one assigned</option>
+                  {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                </select>
+                <ChevronDown size={18} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.5 }} />
+              </div>
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
@@ -150,7 +167,7 @@ const TaskModal = ({ isOpen, onClose, columnId, task, onSuccess }) => {
                 type="date" 
                 value={formData.dueDate} 
                 onChange={(e) => setFormData({...formData, dueDate: e.target.value})} 
-                style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '14px' }}
+                style={{ background: 'rgba(15, 23, 42, 0.8)', borderRadius: '14px', colorScheme: 'dark' }}
               />
             </div>
           </div>

@@ -158,18 +158,21 @@ const Dashboard = () => {
                       onClick={() => navigate(`/board/${board.id}`)}
                       style={{ 
                         padding: '32px', 
-                        borderRadius: '24px', 
+                        borderRadius: '28px', 
                         cursor: 'pointer', 
                         position: 'relative',
-                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
+                        background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.7))',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+                        e.currentTarget.style.transform = 'translateY(-12px) scale(1.02)';
                         e.currentTarget.style.borderColor = 'var(--primary)';
+                        e.currentTarget.style.boxShadow = '0 20px 40px -10px rgba(0,0,0,0.5), 0 0 20px var(--primary-glow)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = 'translateY(0) scale(1)';
                         e.currentTarget.style.borderColor = 'var(--glass-border)';
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
@@ -208,7 +211,23 @@ const Dashboard = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px' }}>
                 {allUsers.map(u => (
-                  <div key={u.id} className="glass" style={{ padding: '24px', borderRadius: '24px', display: 'flex', gap: '20px', alignItems: 'center' }}>
+                  <div key={u.id} className="glass" style={{ 
+                    padding: '24px', 
+                    borderRadius: '24px', 
+                    display: 'flex', 
+                    gap: '20px', 
+                    alignItems: 'center',
+                    transition: 'all 0.4s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.02)';
+                    e.currentTarget.style.boxShadow = '0 15px 30px rgba(0,0,0,0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <div style={{ position: 'relative' }}>
                       <div style={{ width: '64px', height: '64px', background: 'rgba(255,255,255,0.05)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: '700', color: 'var(--primary)' }}>
                         {u.name.charAt(0).toUpperCase()}
