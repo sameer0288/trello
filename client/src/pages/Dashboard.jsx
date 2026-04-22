@@ -85,18 +85,49 @@ const Dashboard = () => {
         </div>
 
         {user?.role === 'ADMIN' && (
-          <nav style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', padding: '6px', borderRadius: '16px', gap: '8px' }}>
+          <nav style={{ 
+            display: 'flex', 
+            background: 'rgba(255, 255, 255, 0.03)', 
+            padding: '6px', 
+            borderRadius: '16px', 
+            gap: '4px',
+            position: 'relative',
+            border: '1px solid var(--glass-border)',
+            backdropFilter: 'blur(10px)'
+          }}>
             <button 
               onClick={() => setActiveTab('boards')}
-              className={`btn ${activeTab === 'boards' ? 'btn-primary' : ''}`}
-              style={{ background: activeTab === 'boards' ? 'var(--primary)' : 'transparent', border: 'none' }}
+              className="btn"
+              style={{ 
+                background: activeTab === 'boards' ? 'var(--primary)' : 'transparent', 
+                color: activeTab === 'boards' ? 'white' : 'var(--text-secondary)',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '10px 20px',
+                transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
+                boxShadow: activeTab === 'boards' ? '0 4px 12px var(--primary-glow)' : 'none',
+                fontWeight: activeTab === 'boards' ? '700' : '500'
+              }}
+              onMouseEnter={(e) => { if(activeTab !== 'boards') e.currentTarget.style.color = 'var(--text-primary)'; }}
+              onMouseLeave={(e) => { if(activeTab !== 'boards') e.currentTarget.style.color = 'var(--text-secondary)'; }}
             >
               <Layout size={18} /> Boards
             </button>
             <button 
               onClick={() => setActiveTab('users')}
-              className={`btn ${activeTab === 'users' ? 'btn-primary' : ''}`}
-              style={{ background: activeTab === 'users' ? 'var(--primary)' : 'transparent', border: 'none' }}
+              className="btn"
+              style={{ 
+                background: activeTab === 'users' ? 'var(--primary)' : 'transparent', 
+                color: activeTab === 'users' ? 'white' : 'var(--text-secondary)',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '10px 20px',
+                transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
+                boxShadow: activeTab === 'users' ? '0 4px 12px var(--primary-glow)' : 'none',
+                fontWeight: activeTab === 'users' ? '700' : '500'
+              }}
+              onMouseEnter={(e) => { if(activeTab !== 'users') e.currentTarget.style.color = 'var(--text-primary)'; }}
+              onMouseLeave={(e) => { if(activeTab !== 'users') e.currentTarget.style.color = 'var(--text-secondary)'; }}
             >
               <Users size={18} /> Members
             </button>
