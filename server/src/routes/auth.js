@@ -7,14 +7,34 @@ const router = express.Router();
 // Register
 router.post('/register', async (req, res) => {
   const { email, password, name, role } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
   try {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already registered. Please sign in.' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
-      data: { email, password: hashedPassword, name, role: role || 'USER' },
+      data: { 
+        email, 
+        password: hashedPassword, 
+        name: name || '', 
+        role: role || 'USER' 
+      },
     });
     res.status(201).json({ message: 'User created successfully', userId: user.id });
   } catch (error) {
-    res.status(400).json({ error: 'User registration failed', details: error.message });
+    console.error('Registration Error:', error);
+    res.status(400).json({ 
+      error: 'Registration failed', 
+      details: error.message.includes('unique constraint') ? 'Email already exists' : error.message 
+    });
   }
 });
 

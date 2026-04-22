@@ -20,9 +20,22 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Heartbeat route for health checks
-app.get('/', (req, res) => {
-  res.status(200).json({ status: 'active', message: 'Trello API is running perfectly' });
+// Heartbeat route with DB check
+app.get('/', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({ 
+      status: 'active', 
+      message: 'Trello API is running perfectly',
+      database: 'Connected'
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'API is alive, but Database is NOT connected',
+      error: err.message
+    });
+  }
 });
 
 // Routes
